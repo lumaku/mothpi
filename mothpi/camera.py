@@ -47,7 +47,7 @@ class MothCamera:
     def capture(self):
         if self.is_available():
             file_path = self.camera.capture(gp.GP_CAPTURE_IMAGE)
-            logging.info(f"New picture: {file_path}")
+            logging.info(f"New picture: {file_path.name}")
             return file_path
         else:
             logging.warning("No Capture, camera not connected.")
@@ -55,7 +55,7 @@ class MothCamera:
 
     def save(self, file_path, target=Path("/tmp") / "out.jpg"):
         if self.is_available():
-            logging.info(f"Copying image {file_path} to {target}")
+            logging.info(f"Copying image {file_path.name} to {target}")
             camera_file = self.camera.file_get(
                 file_path.folder, file_path.name, gp.GP_FILE_TYPE_NORMAL
             )

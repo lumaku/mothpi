@@ -123,4 +123,8 @@ def paint_status_page(state_dict):
         display_str = "OK" if state_dict["display"] else "??"
         display_str = f"Display {display_str}"
         draw.text((140, 80), display_str, font=font, fill=0)
+    if "footer1" in state_dict:
+        draw.text((25, 132), state_dict["footer1"], font=font, fill=0)
+    if "footer2" in state_dict:
+        draw.text((25, 152), state_dict["footer2"], font=font, fill=0)
     return HBlackImage

@@ -23,9 +23,9 @@ from pathlib import Path
 # Mothpi imports
 from camera import MothCamera
 from relais import Relais
-from display import Epaper, paint_status_page
+from display import Epaper, paint_status_page, paint_simple_text_output
 from config import MothConf
-from utils import Periodic, get_parser
+from utils import Periodic, get_parser, reboot
 
 
 class MothPi:
@@ -52,12 +52,17 @@ class MothPi:
             "display": Epaper.is_available(),
             "up_since": datetime.datetime.now(),
             "last_picure": "None yet!",
+            "footer1": "1:CamReconn. 2:-",
+            "footer2": "3: Reboot    4:Config",
         }
         for item in self.config.relais_conf:
             if self.config.relais_conf[item]:
                 Relais.set_on(item)
             else:
                 Relais.set_off(item)
+        # initialize buttons
+        Epaper.set_button_handler(1, self.camera.reconnect)
+        Epaper.set_button_handler(3, reboot)
         # execute the services once to make sure they work:
         self.poll_status()
         self.take_pictures()

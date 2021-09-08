@@ -1,13 +1,10 @@
 # !/usr/bin/python3
 # -*- coding:utf-8 -*-
 
-import time
-import threading
-import queue
-import logging
 import argparse
 from pathlib import Path
 from threading import Timer, Lock
+import os
 
 
 class Periodic(object):
@@ -66,3 +63,7 @@ def get_parser():
         help="Supplemental configuration file.",
     )
     return parser
+
+
+def reboot():
+    os.system("sudo reboot")
