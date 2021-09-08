@@ -1,0 +1,16 @@
+# Mothpi systemd Service
+# See https://man.archlinux.org/man/systemd.unit.5
+
+[Install]
+WantedBy=default.target
+
+[Unit]
+Description=Mothpi Moth Scanner
+
+[Service]
+WorkingDirectory=/usr/local/lib/fridge-pi/
+# Environmental variables from ~/.config/environment.d/mothpi.conf
+ExecStart=/usr/bin/env python3  ${MOTHPI_BASEDIR}/mothpi/mothpi.py ${MOTHPI_CONFIG}
+# User=pi # To test whether it runs as correct user
+Restart=on-failure
+Type=notify
