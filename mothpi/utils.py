@@ -5,7 +5,8 @@ import argparse
 from pathlib import Path
 from threading import Timer, Lock
 import os
-
+import time
+from display import Epaper, paint_simple_text_output
 
 class Periodic(object):
     """
@@ -66,4 +67,7 @@ def get_parser():
 
 
 def reboot():
+    message = paint_simple_text_output(output_string="rebooting...")
+    Epaper.display(message)
+    time.sleep(1)
     os.system("sudo reboot")

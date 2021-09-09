@@ -68,6 +68,10 @@ class MothConf(SimpleNamespace):
     def print_bash_variables(self):
         print(f"{'pictures_save_folder'.upper}={self.pictures_save_folder}")
 
+    @property
+    def num_stored_pictures(self):
+        return len(list(self.pictures_save_folder.glob("*.jpg")))
+
 
 def main():
     # Initialize

@@ -46,7 +46,8 @@ init(){
     # copy systemd unit files
     echo "Copy systemd unit files"
     mkdir -p ~/.config/systemd/user/
-    cp -uv ${BASEDIR}/systemd/mothpi.service ~/.config/systemd/user/
+    cp -uv ${BASEDIR}/systemd/*.service ~/.config/systemd/user/
+    cp -uv ${BASEDIR}/systemd/*.timer ~/.config/systemd/user/
 
     echo "Save configuration."
     touch ~/.mothpi
@@ -54,9 +55,19 @@ init(){
     cat <<EOF > ${SYSTEMD_ENV_PATH}
 MOTHPI_BASEDIR=${BASEDIR}
 MOTHPI_CONFIG=${CONFIGPATH}
+MOTHPI_PICTURES_DIR=/home/pi/pics/
+MOTHPI_REMOTE_PORT=10022
+MOTHPI_SERVER_ADRESS=mothpi@dl.visammod.vision.in.tum.de
+MOTHPI_SERVER_PORT=58022
+MOTHPI_SERVER_STORAGE_DIR=/storage/remote/dl.visammod/mothpi/
 EOF
+    # syncing is done with:
+    # rsync -r --exclude="/*/" -vz -e "ssh -p ${MOTHPI_SERVER_PORT}" --remove-source-files --include='*.jpg'  ${MOTHPI_PICTURES_DIR} ${MOTHPI_SERVER_ADRESS}:${MOTHPI_SERVER_STORAGE_DIR}
     echo "Enable service"
     systemctl --user enable mothpi.service
+    systemctl --user enable sshtunnel.service
+    systemctl --user enable uploader.timer
+    echo "reboot for changes to take effect"
 }
 
 
@@ -70,6 +81,10 @@ selfcheck(){
     cat ${SYSTEMD_ENV_PATH}
     echo "Mothpi service status: "
     systemctl --user status mothpi.service
+    systemctl --user status sshtunnel.service
+    systemctl --user status uploader.timer
+    echo "active timers:"
+    systemctl list-timers --all --user
 }
 
 
@@ -83,7 +98,7 @@ update(){
     systemctl --user stop mothpi.service
     echo "-- Update systemd files"
     cp -uv ${BASEDIR}/systemd/*.service ~/.config/systemd/user/
-    echo "-- Restart systemd services, run:"
+    echo "-- Restart systemd services, reboot or run:"
     echo "systemctl --user start mothpi.service"
 }
 

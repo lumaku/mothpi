@@ -1,0 +1,10 @@
+# Mothpi systemd Service
+# See https://man.archlinux.org/man/systemd.unit.5
+
+[Unit]
+Description=Mothpi Pictures Uploader
+
+[Service]
+Type=oneshot
+# Environmental variables from ~/.config/environment.d/mothpi.conf
+ExecStart=/bin/env rsync -r --exclude="/*/" -vz -e "ssh -p ${MOTHPI_SERVER_PORT}" --remove-source-files --include='*.jpg'  ${MOTHPI_PICTURES_DIR} ${MOTHPI_SERVER_ADRESS}:${MOTHPI_SERVER_STORAGE_DIR}

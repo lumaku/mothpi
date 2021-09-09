@@ -26,8 +26,6 @@ Also, the Mothpi program will run as user, so make sure that [automatic start-up
 loginctl enable-linger pi
 ```
 
-
-
 The main Mothpi programm can be downloaded from the repository: Set up an access token in *Settings*->*Access Tokens*, then use it to access this *Mothpi* repository.
 
 ```bash
@@ -39,6 +37,9 @@ The access token is only needed once as it will be stored within the local git r
 The included script automates the updating process as well as other tasks.
 
 
+To reduce power usage, switch of the display by siwtich in to "Sucher" in the menu for "Display/Sucher" on Page 3 of the Gear ⚙️ page.
+
+
 ## Run Mothpi
 
 Start with `mothpi.sh` that provides a boilerplate for mothpi, including functions for:
@@ -47,14 +48,18 @@ Start with `mothpi.sh` that provides a boilerplate for mothpi, including functio
 * reverse ssh tunnel to the main server and
 * a pictures uploader.
 
+Initialize with:
+```
+./mothpi.sh init
+```
+
 The core program that takes pictures is in `mothpi/mothpy.py`.
 
 
-## Mothpi default configuraiotn
+## Mothpi default configuration
 
 
 The mothpi configuration file will be saved in `$HOME/.mothpi`.
+Pictures are saved in `/home/pi/pics/` and will be moved over to the server in regular intervals.
 
-
-## 
 

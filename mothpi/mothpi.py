@@ -21,6 +21,7 @@ import argparse
 from pathlib import Path
 
 # Mothpi imports
+import gphoto2 as gp
 from camera import MothCamera
 from relais import Relais
 from display import Epaper, paint_status_page, paint_simple_text_output
@@ -51,9 +52,9 @@ class MothPi:
             "camera": self.camera.is_available(),
             "display": Epaper.is_available(),
             "up_since": datetime.datetime.now(),
-            "last_picure": "None yet!",
-            "footer1": "1:CamReconn. 2:-",
-            "footer2": "3: Reboot    4:Config",
+            "last_picture": "None yet!",
+            "footer1": "1:CamReconn",
+            "footer2": "3: Reboot",
         }
         for item in self.config.relais_conf:
             if self.config.relais_conf[item]:
@@ -79,14 +80,28 @@ class MothPi:
         self.status_dict["camera"] = self.camera.is_available()
         self.status_dict["display"] = Epaper.is_available()
         self.status_dict["poll_time"] = datetime.datetime.now()
+        self.status_dict["num_pics"] = self.config.num_stored_pictures
         status_image = paint_status_page(self.status_dict)
         Epaper.display(status_image)
 
     def take_pictures(self):
-        picture_path = self.camera.capture()
+        picture_path = None
+        try:
+            picture_path = self.camera.capture()
+        except gp.GPhoto2Error as e:
+            cam_active_str = (
+                "Cam available" if self.camera.is_available() else "no camera"
+            )
+            logging.error(f"GPhoto2Error ({cam_active_str}): {e}")
+            self.camera.reconnect()
+            # try again
+            try:
+                picture_path = self.camera.capture()
+            except:
+                logging.error("Camera capture failed again after reconnect.")
         if picture_path:
             timestr = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-            self.status_dict["last_picture"] = datetime.datetime.now()
+            self.status_dict["last_picture"] = timestr
             target = self.config.pictures_save_folder / (timestr + ".jpg")
             self.camera.save(picture_path, target)
 

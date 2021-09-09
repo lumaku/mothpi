@@ -110,21 +110,24 @@ def paint_status_page(state_dict):
     font = ImageFont.truetype(font=DISPLAY_FONT, size=20)
     titlestr = "Mothpi"
     timestr = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    draw.text((25, 20), titlestr, font=font, fill=0)
-    draw.text((25, 40), timestr, font=font, fill=0)
-    if "last_picure" in state_dict:
-        last_pic_str = "last pic: " + state_dict["last_picure"]
-        draw.text((25, 60), last_pic_str, font=font, fill=0)
+    draw.text((15, 20), titlestr, font=font, fill=0)
+    draw.text((15, 40), timestr, font=font, fill=0)
+    if "last_picture" in state_dict:
+        last_pic_str = "last pic: " + state_dict["last_picture"]
+        draw.text((15, 60), last_pic_str, font=font, fill=0)
     if "camera" in state_dict:
         camera_str = "OK️" if state_dict["camera"] else "??"
         camera_str = f"Camera {camera_str}"
-        draw.text((25, 80), camera_str, font=font, fill=0)
+        draw.text((15, 80), camera_str, font=font, fill=0)
     if "display" in state_dict:
         display_str = "OK" if state_dict["display"] else "??"
         display_str = f"Display {display_str}"
         draw.text((140, 80), display_str, font=font, fill=0)
+    if "num_pics" in state_dict:
+        num_pics_str = f"#{state_dict['num_pics']}"
+        draw.text((140, 100), num_pics_str, font=font, fill=0)
     if "footer1" in state_dict:
-        draw.text((25, 132), state_dict["footer1"], font=font, fill=0)
+        draw.text((15, 132), state_dict["footer1"], font=font, fill=0)
     if "footer2" in state_dict:
-        draw.text((25, 152), state_dict["footer2"], font=font, fill=0)
+        draw.text((15, 152), state_dict["footer2"], font=font, fill=0)
     return HBlackImage
