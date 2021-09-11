@@ -114,7 +114,7 @@ def paint_status_page(state_dict):
         last_pic_str = "~" + state_dict["last_picture"]
         draw.text((15, 60), last_pic_str, font=font, fill=0)
     if "camera" in state_dict:
-        camera_str = "OK️" if state_dict["camera"] else "??"
+        camera_str = "OK" if state_dict["camera"] else "??"
         camera_str = f"Cam {camera_str}"
         draw.text((15, 80), camera_str, font=font, fill=0)
     if "display" in state_dict:
