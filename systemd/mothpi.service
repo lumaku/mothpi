@@ -11,4 +11,5 @@ Description=Mothpi Moth Scanner
 # Environmental variables from ~/.config/environment.d/mothpi.conf
 ExecStart=/usr/bin/env python3  ${MOTHPI_BASEDIR}/mothpi/mothpi.py --config ${MOTHPI_CONFIG}
 Restart=on-failure
+User=pi
 Type=notify

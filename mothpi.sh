@@ -98,8 +98,10 @@ update(){
     systemctl --user stop mothpi.service
     echo "-- Update systemd files"
     cp -uv ${BASEDIR}/systemd/*.service ~/.config/systemd/user/
+    cp -uv ${BASEDIR}/systemd/*.timer ~/.config/systemd/user/
     echo "-- Restart systemd services, reboot or run:"
     echo "systemctl --user start mothpi.service"
+    systemctl --user daemon-reload
 }
 
 

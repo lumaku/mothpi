@@ -52,9 +52,7 @@ def handle_btn_press(btn):
 
 
 class Epaper:
-    @staticmethod
-    def is_available():
-        return DISPLAY_AVAILABLE
+    is_available = DISPLAY_AVAILABLE
 
     @staticmethod
     def set_button_handler(button_nr, handler_fn):
@@ -107,25 +105,25 @@ def paint_status_page(state_dict):
     HBlackImage = Image.new("1", (EPAPER_HEIGHT, EPAPER_WIDTH), 255)  # 298*126
     # create a draw object and the font object we will use for the display
     draw = ImageDraw.Draw(HBlackImage)
-    font = ImageFont.truetype(font=DISPLAY_FONT, size=20)
+    font = ImageFont.truetype(font=DISPLAY_FONT, size=16)
     titlestr = "Mothpi"
     timestr = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    draw.text((15, 20), titlestr, font=font, fill=0)
+    draw.text((15, 15), titlestr, font=font, fill=0)
     draw.text((15, 40), timestr, font=font, fill=0)
     if "last_picture" in state_dict:
-        last_pic_str = "last pic: " + state_dict["last_picture"]
+        last_pic_str = "~" + state_dict["last_picture"]
         draw.text((15, 60), last_pic_str, font=font, fill=0)
     if "camera" in state_dict:
         camera_str = "OK️" if state_dict["camera"] else "??"
-        camera_str = f"Camera {camera_str}"
+        camera_str = f"Cam {camera_str}"
         draw.text((15, 80), camera_str, font=font, fill=0)
     if "display" in state_dict:
         display_str = "OK" if state_dict["display"] else "??"
         display_str = f"Display {display_str}"
-        draw.text((140, 80), display_str, font=font, fill=0)
+        draw.text((100, 80), display_str, font=font, fill=0)
     if "num_pics" in state_dict:
         num_pics_str = f"#{state_dict['num_pics']}"
-        draw.text((140, 100), num_pics_str, font=font, fill=0)
+        draw.text((15, 100), num_pics_str, font=font, fill=0)
     if "footer1" in state_dict:
         draw.text((15, 132), state_dict["footer1"], font=font, fill=0)
     if "footer2" in state_dict:

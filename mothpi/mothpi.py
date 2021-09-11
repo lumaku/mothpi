@@ -33,7 +33,7 @@ class MothPi:
     state_queue = queue.Queue()
     pictures_queue = queue.Queue()
     camera = MothCamera()
-    epaper_available = Epaper.is_available()
+    epaper_available = Epaper.is_available
     services = {}
 
     def __init__(self, configuration: MothConf):
@@ -49,10 +49,10 @@ class MothPi:
             autostart=False,
         )
         self.status_dict = {
-            "camera": self.camera.is_available(),
-            "display": Epaper.is_available(),
+            "camera": self.camera.is_available,
+            "display": Epaper.is_available,
             "up_since": datetime.datetime.now(),
-            "last_picture": "None yet!",
+            "last_picture": "No photo yet!",
             "footer1": "1:CamReconn",
             "footer2": "3: Reboot",
         }
@@ -77,28 +77,15 @@ class MothPi:
             service.stop()
 
     def poll_status(self):
-        self.status_dict["camera"] = self.camera.is_available()
-        self.status_dict["display"] = Epaper.is_available()
+        self.status_dict["camera"] = self.camera.is_available
+        self.status_dict["display"] = Epaper.is_available
         self.status_dict["poll_time"] = datetime.datetime.now()
         self.status_dict["num_pics"] = self.config.num_stored_pictures
         status_image = paint_status_page(self.status_dict)
         Epaper.display(status_image)
 
     def take_pictures(self):
-        picture_path = None
-        try:
-            picture_path = self.camera.capture()
-        except gp.GPhoto2Error as e:
-            cam_active_str = (
-                "Cam available" if self.camera.is_available() else "no camera"
-            )
-            logging.error(f"GPhoto2Error ({cam_active_str}): {e}")
-            self.camera.reconnect()
-            # try again
-            try:
-                picture_path = self.camera.capture()
-            except:
-                logging.error("Camera capture failed again after reconnect.")
+        picture_path = self.camera.capture()
         if picture_path:
             timestr = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
             self.status_dict["last_picture"] = timestr
