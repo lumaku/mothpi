@@ -3,10 +3,42 @@
 
 import argparse
 from pathlib import Path
+import urllib.request, json
+import datetime
 from threading import Timer, Lock
 import os
 import time
+
+
 from display import Epaper, paint_simple_text_output
+
+
+class WeatherStation:
+    """
+    Example:
+
+    x = WeatherStation()
+    x.get_todays_weather_dict()
+    """
+
+    # https://api.brightsky.dev/weather?lat=48.150533822545&lon=11.56845056702451&date=2021-08-27
+    brightsky_url = "https://api.brightsky.dev/weather?lat={lat}&lon={lon}&date={date}"
+
+    def date_str_from_datetime(self, dt: datetime.datetime):
+        date_str = dt.strftime("%Y-%m-%d")
+        return date_str
+
+    def get_todays_weather_dict(self, lat=48.151, lon=11.568, date="2021-08-27"):
+        parameter_dict = {"lat": lat, "lon": lon, "date": date}
+        address = self.brightsky_url.format(**parameter_dict)
+        print(address)
+        try:
+            with urllib.request.urlopen(address) as url:
+                data = json.loads(url.read().decode())
+                return data
+        except:
+            return {}
+
 
 class Periodic(object):
     """

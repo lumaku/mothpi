@@ -72,7 +72,7 @@ class Epaper:
 
     @staticmethod
     def display(HBlackImage: Image):
-        HBlackImage.save("/tmp/epaper_display.jpg")
+        HBlackImage.save("/tmp/epaper_display.png")
         if DISPLAY_AVAILABLE:
             epd.display(epd.getbuffer(HBlackImage))
 

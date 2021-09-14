@@ -33,13 +33,18 @@ CONFIG_FILE_PATHS: list = [
 
 class MothConf(SimpleNamespace):
     # Take pictures in a certain interval (in seconds)
-    capture_interval = 60 * 2
+    capture_interval = 60 * 4
     polling_interval = 60 * 1
+    cam_reconnect_interval = 60 * 60 * 5
     # Folder to save pictures
-    pictures_save_folder = Path.home() / "pics"
+    pictures_save_folder = str(Path.home() / "pics")
     # Default relais config
     relais_conf = {1: True, 2: False, 3: False}
     config_file_name = None
+    # optional: use weather data to restrict storage use
+    use_weather_data = False
+    # optional daily reboot at noon (only do this with correct time stamps)
+    daily_reboot = False
 
     def __init__(self, config_file=None, **kwargs):
         super().__init__(**kwargs)
@@ -53,13 +58,14 @@ class MothConf(SimpleNamespace):
             logging.error("No Configuration file found or supplied as argument!")
             logging.error("Starting with default config.")
             config_file = CONFIG_FILE_PATHS[-1]
+            logging.error(f"Config file: {config_file}")
         else:
             logging.info(f"Loading configuration from {config_file}")
             with open(config_file, "r") as f:
-                config = yaml.load(f) or {}
+                config = yaml.safe_load(f)
             self.__dict__.update(config)
         self.config_file_name = config_file
-        self.pictures_save_folder.mkdir(parents=True, exist_ok=True)
+        Path(self.pictures_save_folder).mkdir(parents=True, exist_ok=True)
 
     def save_config(self):
         with open(self.config_file_name, "w") as f:
@@ -70,7 +76,7 @@ class MothConf(SimpleNamespace):
 
     @property
     def num_stored_pictures(self):
-        return len(list(self.pictures_save_folder.glob("*.jpg")))
+        return len(list(Path(self.pictures_save_folder).glob("*.jpg")))
 
 
 def main():

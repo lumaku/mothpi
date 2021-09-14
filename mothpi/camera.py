@@ -18,8 +18,9 @@ class MothCamera:
     camera = None
     camera_found = False
 
-    def __init__(self):
-        self.reconnect()
+    def __init__(self, autoconnect=False):
+        if autoconnect:
+            self.reconnect()
 
     def reconnect(self):
         if self.camera:
@@ -28,10 +29,10 @@ class MothCamera:
             self.camera = gp.Camera()
             self.camera.init()
             self.camera_found = True
-            logging.info("Camera is available.")
+            logging.info("Reconnect: Camera is available.")
         except gp.GPhoto2Error:
             self.camera = None
-            logging.error("No Camera found!")
+            logging.error("Reconnect: No Camera found!")
 
     @property
     def is_available(self):
@@ -41,7 +42,7 @@ class MothCamera:
         if self.is_available:
             text = self.camera.get_summary()
         else:
-            text = "Camera not connected."
+            text = "Camera Summary: Camera not connected."
         return str(text)
 
     def get_camera_clock(self):
@@ -58,12 +59,11 @@ class MothCamera:
                 )
                 logging.error(f"GPhoto2Error ({cam_active_str}): {e}")
                 self.reconnect()
-                try:   # try again
+                try:  # try again
                     file_path = self.camera.capture()
                 except:
                     logging.error("Camera capture failed again after reconnect.")
             if file_path:
-                logging.info(f"New picture: {file_path.name}")
                 return file_path
         logging.warning("No Capture, camera not connected.")
         return None
