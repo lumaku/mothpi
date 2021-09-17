@@ -96,7 +96,7 @@ class MothPi:
         if picture_path:
             timestr = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
             self.status_dict["last_picture"] = timestr
-            target = self.config.pictures_save_folder / (timestr + ".jpg")
+            target = Path( self.config.pictures_save_folder ) / (timestr + ".jpg")
             self.camera.save(picture_path, target)
 
     def refresh_camera(self):
