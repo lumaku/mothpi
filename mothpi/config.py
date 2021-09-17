@@ -77,6 +77,18 @@ class MothConf(SimpleNamespace):
     def print_bash_variables(self):
         print(f"{'pictures_save_folder'.upper}={self.pictures_save_folder}")
 
+    def __str__(self):
+        config_dict = self.__dict__
+        config_dict["capture_interval"] = self.capture_interval
+        config_dict["polling_interval"] = self.polling_interval
+        config_dict["cam_reconnect_interval"] = self.cam_reconnect_interval
+        config_dict["pictures_save_folder"] = self.pictures_save_folder
+        config_dict["relais_conf"] = self.relais_conf
+        config_dict["config_file_name"] = self.config_file_name
+        config_dict["use_weather_data"] = self.use_weather_data
+        config_dict["daily_reboot"] = self.daily_reboot
+        return str(config_dict)
+
     @property
     def num_stored_pictures(self):
         return len(list(Path(self.pictures_save_folder).glob("*.jpg")))

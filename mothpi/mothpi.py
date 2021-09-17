@@ -26,7 +26,7 @@ from camera import MothCamera
 from relais import Relais
 from display import Epaper, paint_status_page, paint_simple_text_output
 from config import MothConf
-from utils import Periodic, get_parser, reboot
+from utils import Periodic, get_parser, reboot, is_disk_full
 
 
 class MothPi:
@@ -93,10 +93,10 @@ class MothPi:
 
     def take_pictures(self):
         picture_path = self.camera.capture()
-        if picture_path:
+        if picture_path and not is_disk_full(self.config.pictures_save_folder):
             timestr = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
             self.status_dict["last_picture"] = timestr
-            target = Path( self.config.pictures_save_folder ) / (timestr + ".jpg")
+            target = Path(self.config.pictures_save_folder) / (timestr + ".jpg")
             self.camera.save(picture_path, target)
 
     def refresh_camera(self):
@@ -130,6 +130,7 @@ def main():
     # https://github.com/torfsen/python-systemd-tutorial
     systemd.daemon.notify("READY=1")
     logging.info("Ready.")
+    logging.info(f"Configuration: {str(config)}")
 
     config.daily_reboot = True
     config.save_config()

@@ -8,6 +8,7 @@ import datetime
 from threading import Timer, Lock
 import os
 import time
+import shutil
 
 
 from display import Epaper, paint_simple_text_output
@@ -103,3 +104,12 @@ def reboot():
     Epaper.display(message)
     time.sleep(1)
     os.system("sudo reboot")
+
+
+def is_disk_full(path):
+    total, used, free = shutil.disk_usage(path)
+    mib = 1000 * 1000
+    if free < (50 * mib):
+        return True
+    else:
+        return False
