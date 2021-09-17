@@ -80,6 +80,9 @@ class MothPi:
     def stop_service(self):
         for service in self.services.values():
             service.stop()
+        # disables all relais:
+        for i in [1,2,3]:
+            Relais.set_off(i)
 
     def poll_status(self):
         self.status_dict["camera"] = self.camera.is_available
