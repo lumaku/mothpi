@@ -9,16 +9,23 @@ from PIL import Image, ImageDraw, ImageFont  # import the image libraries
 EPAPER_HEIGHT = 264
 EPAPER_WIDTH = 176
 
+# First font found wins
 LIST_OF_FONTS = [
+    "../extras/NotoSans-ExtraCondensedSemiBold.ttf",
+    "/usr/share/fonts/truetype/noto/NotoSans-ExtraCondensedSemiBold.ttf",
+    "/usr/share/fonts/noto/NotoSans-ExtraCondensedSemiBold.ttf",
     "/usr/share/fonts/truetype/google/Bangers-Regular.ttf",
     "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
     "/usr/share/fonts/ubuntu/Ubuntu-M.ttf",
-    "usr/share/fonts/noto/NotoSansMono-Regular.ttf",
+    "/usr/share/fonts/noto/NotoSansMono-Regular.ttf",
 ]
+# Noto Fonts: https://www.google.com/get/noto/#sans-mono
 DISPLAY_FONT = None
 for item in LIST_OF_FONTS:
     if Path(item).exists():
         DISPLAY_FONT = item
+        logging.info(f"Display font: {DISPLAY_FONT}")
+        break
 
 try:
     from waveshare_epd import epd2in7
@@ -71,8 +78,10 @@ class Epaper:
             raise ValueError(f"button_nr has to be in [1,2,3,4]! ({button_nr})")
 
     @staticmethod
-    def display(HBlackImage: Image, cc_to="/tmp/epaper_display.png"):
-        HBlackImage.save(cc_to)
+    def display(HBlackImage: Image, cc_to=None):
+        HBlackImage.save("/tmp/epaper_display.png")
+        if cc_to:
+            HBlackImage.save(cc_to)
         if DISPLAY_AVAILABLE:
             epd.display(epd.getbuffer(HBlackImage))
 
@@ -108,8 +117,8 @@ def paint_status_page(state_dict):
     font = ImageFont.truetype(font=DISPLAY_FONT, size=16)
     titlestr = "Mothpi"
     timestr = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    draw.text((15, 15), titlestr, font=font, fill=0)
-    draw.text((15, 40), timestr, font=font, fill=0)
+    draw.text((0, 0), titlestr, font=font, fill=0)
+    draw.text((15, 15), timestr, font=font, fill=0)
     if "last_picture" in state_dict:
         last_pic_str = "~" + state_dict["last_picture"]
         draw.text((15, 60), last_pic_str, font=font, fill=0)

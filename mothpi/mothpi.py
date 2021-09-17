@@ -72,6 +72,7 @@ class MothPi:
         self.refresh_camera()
         self.poll_status()
         self.take_pictures()
+        self.poll_status()
 
     def serve(self):
         for service in self.services.values():
@@ -87,8 +88,8 @@ class MothPi:
     def poll_status(self):
         self.status_dict["camera"] = self.camera.is_available
         self.status_dict["display"] = Epaper.is_available
-        self.status_dict["poll_time"] = datetime.datetime.now()
         self.status_dict["num_pics"] = self.config.num_stored_pictures
+        self.status_dict["poll_time"] = datetime.datetime.now()
         status_image = paint_status_page(self.status_dict)
         cc_to =  Path(self.config.pictures_save_folder) / ("epaper_display.png")
         Epaper.display(status_image, cc_to=str(cc_to))

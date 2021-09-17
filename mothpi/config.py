@@ -33,7 +33,7 @@ CONFIG_FILE_PATHS: list = [
 
 class MothConf(SimpleNamespace):
     # Take pictures in a certain interval (in seconds)
-    capture_interval = 60 * 4
+    capture_interval = 60 * 5
     polling_interval = 60 * 1
     cam_reconnect_interval = 60 * 60 * 5
     # Folder to save pictures
