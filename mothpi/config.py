@@ -61,9 +61,12 @@ class MothConf(SimpleNamespace):
             logging.error(f"Config file: {config_file}")
         else:
             logging.info(f"Loading configuration from {config_file}")
-            with open(config_file, "r") as f:
-                config = yaml.safe_load(f)
-            self.__dict__.update(config)
+            try:
+                with open(config_file, "r") as f:
+                    config = yaml.safe_load(f)
+                self.__dict__.update(config)
+            except:
+                logging.error("Error reading file, using default configuration.")
         self.config_file_name = config_file
         Path(self.pictures_save_folder).mkdir(parents=True, exist_ok=True)
 

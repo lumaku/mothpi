@@ -80,9 +80,9 @@ selfcheck(){
     echo "Systemd config:"
     cat ${SYSTEMD_ENV_PATH}
     echo "Mothpi service status: "
-    systemctl --user status mothpi.service
-    systemctl --user status sshtunnel.service
-    systemctl --user status uploader.timer
+    systemctl --user status mothpi.service || true
+    systemctl --user status sshtunnel.service || true
+    systemctl --user status uploader.timer || true
     echo "active timers:"
     systemctl list-timers --all --user
 }
