@@ -39,7 +39,7 @@ class MothConf(SimpleNamespace):
     # Folder to save pictures
     pictures_save_folder = str(Path.home() / "pics")
     # Default relais config
-    relais_conf = {1: True, 2: False, 3: False}
+    relais_conf = {1: False, 2: False, 3: True}
     config_file_name = None
     # optional: use weather data to restrict storage use
     use_weather_data = False

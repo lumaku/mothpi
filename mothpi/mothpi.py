@@ -14,10 +14,8 @@ Put a Rapsberry Pi in the woods and take pictures of moths.
 import time
 import datetime
 import queue
-import sys
 import logging
 import systemd.daemon
-import argparse
 from pathlib import Path
 
 # Mothpi imports
