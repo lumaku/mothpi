@@ -87,7 +87,8 @@ class MothPi:
         self.status_dict["poll_time"] = datetime.datetime.now()
         self.status_dict["num_pics"] = self.config.num_stored_pictures
         status_image = paint_status_page(self.status_dict)
-        Epaper.display(status_image)
+        cc_to =  Path(self.config.pictures_save_folder) / ("epaper_display.png")
+        Epaper.display(status_image, cc_to=str(cc_to))
 
     def take_pictures(self):
         picture_path = self.camera.capture()

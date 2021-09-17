@@ -71,8 +71,8 @@ class Epaper:
             raise ValueError(f"button_nr has to be in [1,2,3,4]! ({button_nr})")
 
     @staticmethod
-    def display(HBlackImage: Image):
-        HBlackImage.save("/tmp/epaper_display.png")
+    def display(HBlackImage: Image, cc_to="/tmp/epaper_display.png"):
+        HBlackImage.save(cc_to)
         if DISPLAY_AVAILABLE:
             epd.display(epd.getbuffer(HBlackImage))
 
