@@ -4,8 +4,12 @@ WantedBy=default.target
 
 [Unit]
 Description=Mothpi SSH Reverse SSH tunnel
+After=network-online.target
+Wants=network-online.target
+
 
 [Service]
 # Environmental variables from ~/.config/environment.d/mothpi.conf
 ExecStart=ssh -N -R ${MOTHPI_REMOTE_PORT}:localhost:22 ${MOTHPI_SERVER_ADRESS} -p ${MOTHPI_SERVER_PORT}
 Restart=on-failure
+RestartSec=1min

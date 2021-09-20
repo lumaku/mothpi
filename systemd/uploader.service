@@ -3,12 +3,13 @@
 
 [Unit]
 Description=Mothpi Pictures Uploader
+Wants=network-online.target
 
 [Service]
 Type=oneshot
 ExecStart=/bin/env rsync -r --exclude="/*/" -z -e "ssh -p ${MOTHPI_SERVER_PORT}" --remove-source-files --include='*.jpg' --include='*.png'  ${MOTHPI_PICTURES_DIR} ${MOTHPI_SERVER_ADRESS}:${MOTHPI_SERVER_STORAGE_DIR}
 
 # Explanation:
-# --exclude="/*/" Sbdirectories are not copied
+# --exclude="/*/" Subdirectories are not copied
 # --include='*.xxx' only include xxx files
 # Environmental variables from ~/.config/environment.d/mothpi.conf

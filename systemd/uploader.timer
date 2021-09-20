@@ -3,7 +3,7 @@ Description=Mothpi Pictures Uploader Timer
 
 [Timer]
 OnBootSec=15min
-OnUnitActiveSec=1h
+OnUnitActiveSec=30min
 
 [Install]
 WantedBy=timers.target
