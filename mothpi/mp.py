@@ -24,8 +24,10 @@ from mothpi.camera import MothCamera
 from mothpi.relais import Relais
 from mothpi.display import Epaper, paint_status_page, paint_simple_text_output
 from mothpi.config import config
-from mothpi.utils import Periodic, reboot, is_disk_full, is_sunshine
-from mothpi.utils import Weather, get_ip_addresses, get_disk_free_capacity
+from mothpi.utils import Periodic, reboot
+from mothpi.utils import is_disk_full, get_disk_free_capacity
+from mothpi.utils import get_ip_addresses
+from mothpi.weather import Weather, is_sunshine
 
 
 class MothPi:

@@ -60,9 +60,10 @@ def main():
 
     # if needed, start web interface
     if args.app:
+        from mothpi.app import create_app
+
         port = args.port
         logging.info(f"Starting web app on port {port}.")
-        from mothpi.app import create_app
         create_app().run(host="0.0.0.0", port=port)
 
     # Systemd service notification
