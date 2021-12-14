@@ -36,14 +36,20 @@ Also, the Mothpi program will run as user, so make sure that [automatic start-up
 loginctl enable-linger pi
 ```
 
-The main Mothpi programm can be downloaded from the repository: Set up an access token in *Settings*->*Access Tokens*, then use it to access this *Mothpi* repository.
+### Mothpi installation
+
+The main Mothpi programm can be downloaded from this git repository.
+```bash
+git clone https://github.com/lumaku/mothpi ~/mothpi
+```
+
+If you use a development version and need an access token, set up an access token in *Settings*->*Access Tokens*, then use it to access this *Mothpi* repository.
 
 ```bash
 MOTHPI_TOKEN=<token>
 git clone https://gitlab-ci-token:${MOTHPI_TOKEN}@gitlab.lrz.de/visammod/mothpi ~/mothpi
 ```
 
-The access token is only needed once as it will be stored within the local git repository configuration.
 The included script automates the updating process as well as other tasks.
 
 ### Camera setup
@@ -69,6 +75,17 @@ Initialize with:
 this will copy and enable systemd services and set up systemd service variables.
 
 The core program that takes pictures is in `mothpi/mothpy.py`.
+
+
+## Mothpi App
+
+The web app included in `mothpi/app.py` provides a web interface to check its status and change the configuration.
+It can be accessed on Port 8000.
+The IP address of the device is displayed on the e-Paper display, if available.
+
+Example configuration page:
+
+![Configuration page of the Mothpi App](doc/mothpi_app_config.png)
 
 
 ## Mothpi default configuration

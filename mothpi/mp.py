@@ -2,10 +2,10 @@
 # -*- coding:utf-8 -*-
 
 """
-Mothpi
+Mothpi.
 
 Put a Raspberry Pi in the woods and take pictures of moths.
-
+This unit provides the main control module.
 
 2021, Technische Universität München, Ludwig Kürzinger
 """
@@ -20,12 +20,12 @@ from typing import Union
 
 # Mothpi imports
 import gphoto2 as gp
-from camera import MothCamera
-from relais import Relais
-from display import Epaper, paint_status_page, paint_simple_text_output
-from config import config
-from utils import Periodic, reboot, is_disk_full, is_sunshine
-from utils import Weather, get_ip_addresses, get_disk_free_capacity
+from mothpi.camera import MothCamera
+from mothpi.relais import Relais
+from mothpi.display import Epaper, paint_status_page, paint_simple_text_output
+from mothpi.config import config
+from mothpi.utils import Periodic, reboot, is_disk_full, is_sunshine
+from mothpi.utils import Weather, get_ip_addresses, get_disk_free_capacity
 
 
 class MothPi:

@@ -1,6 +1,17 @@
 # !/usr/bin/python
 # -*- coding:utf-8 -*-
 
+"""
+Relais hat interface for Mothpi.
+
+The relais module is centrally controlled in this unit.
+All control functions are available as staticmethods and thus
+only need to be imported, and don't need to be initialized.
+
+2021, Technische Universität München, Ludwig Kürzinger
+"""
+
+
 ##################################################
 
 #           P26 ----> Relay_Ch1

@@ -23,6 +23,7 @@ from mothpi.config import config
 
 
 def get_corresponding_field(key, value, description=None):
+    """Derive the field type from the value and return a form element."""
     # [int, float, str, bool]
     kwargs = {"label": key, "default": value, "description": description}
     if type(value) == int:
@@ -40,9 +41,11 @@ def get_corresponding_field(key, value, description=None):
 
 
 def create_app():
-    # We are using the "Application Factory"-pattern here, which is described
-    # in detail inside the Flask docs:
-    # http://flask.pocoo.org/docs/patterns/appfactories/
+    """Create the Flask app.
+
+    Note that the app may be started either from `mothpi/app.py`
+    or from `mothpi/main.py`.
+    """
     app = Flask(__name__)
     logging.info("Started flask server")
     secret_token = uuid.uuid4().hex
@@ -63,6 +66,7 @@ def create_app():
     # Shows a long signup form, demonstrating form rendering.
     @app.route("/")
     def index():
+        """Main page."""
         # Status image
         status_image = (
             "/home/kue/pics/epaper_display.png"  # config.get_status_img_path()
@@ -73,13 +77,16 @@ def create_app():
             "utf-8"
         )
         # Base64 encoding looks like this:
-        # status_image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=="
+        # status_image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA"\
+        # "AAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNB"\
+        # "AAO9TXL0Y4OHwAAAABJRU5ErkJggg=="
 
         return render_template("index.html", status_image=status_image)
 
     # Shows a long signup form, demonstrating form rendering.
     @app.route("/config", methods=("GET", "POST"))
     def configuration_page():
+        """Configuration page."""
         # Config form with dynamic fields
         class ConfigForm(FlaskForm):
             submit_button = SubmitField("Save Changes to Configuration")
@@ -91,7 +98,6 @@ def create_app():
                 get_corresponding_field(key, value, description=description),
             )
         change_dict = {key: value for key, value, _ in config.get_descriptive_list()}
-
         form = ConfigForm()
         if form.validate_on_submit():
             for item in change_dict:
@@ -113,4 +119,4 @@ def create_app():
 
 
 if __name__ == "__main__":
-    create_app().run(debug=True)
+    create_app().run(debug=True, port=8000)

@@ -1,6 +1,13 @@
 # !/usr/bin/python3
 # -*- coding:utf-8 -*-
 
+"""
+Camera interface for Mothpi.
+
+This interface may change if the camera is changed.
+
+2021, Technische Universität München, Ludwig Kürzinger
+"""
 
 import logging
 from pathlib import Path

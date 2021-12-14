@@ -1,6 +1,13 @@
 # !/usr/bin/python3
 # -*- coding:utf-8 -*-
 
+"""
+E-Paper display interface for Mothpi.
+
+2021, Technische Universität München, Ludwig Kürzinger
+"""
+
+
 import logging
 import datetime
 from pathlib import Path

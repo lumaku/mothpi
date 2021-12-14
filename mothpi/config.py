@@ -2,16 +2,12 @@
 # -*- coding:utf-8 -*-
 
 """
-Mothpi
+Mothpi Configuration utility
 
-Configuration utility for Mothpi.
-
-Usage:
-    - Import as regular Python object
-    - Run this file from bash to obtain configuration
+This unit providesa global object ``config`` that contains, loads
+and stores the configuration.
 
 2021, Technische Universität München, Ludwig Kürzinger
-
 """
 
 import logging
@@ -87,6 +83,12 @@ class MothConf(SimpleNamespace):
     capture_filter_daytime = False
 
     def __init__(self, config_file=None, **kwargs):
+        """Initialize.
+
+        First, check for a configuration file and if there is none found,
+        fall back to default values and default file name.
+        Also, create the picture save folder if not yet available.
+        """
         super().__init__(**kwargs)
         # Take the next best config file,
         # or the one supplied by argument
@@ -110,11 +112,13 @@ class MothConf(SimpleNamespace):
         Path(self.pictures_save_folder).mkdir(parents=True, exist_ok=True)
 
     def save_config(self):
+        """Save configuration into configuration file."""
         logging.info(f"Saving the configuration in file {self.config_file_name}")
         with open(self.config_file_name, "w") as f:
             json.dump(self.__dict__, f)
 
     def get_dict(self):
+        """Return a dict of all changeable parameters, only with descriptions."""
         return {
             x: getattr(self, x)
             for x in self.__dir__()
@@ -124,7 +128,7 @@ class MothConf(SimpleNamespace):
     def get_descriptive_list(self):
         """Get a triple of key, value, description for configuration entries.
 
-        dicts are not yet inlcuded, as they are harder to process.
+        (dicts are not included here)
         """
         descriptive_list = []
         for x in self.__dir__():
@@ -137,6 +141,7 @@ class MothConf(SimpleNamespace):
         return descriptive_list
 
     def get_status_img_path(self):
+        """Return path to pictures save folder."""
         return Path(self.pictures_save_folder) / self.status_image_filename
 
     def __str__(self):
@@ -149,6 +154,9 @@ class MothConf(SimpleNamespace):
         )
 
     def validate_configuration(self):
+        """Validate configuration.
+        Returns True if changes were necessary.
+        """
         """Ensure that parameters are in sane bounds."""
         config_changed = False
         if not -90.0 < self.lat < +90.0:
@@ -174,6 +182,7 @@ class MothConf(SimpleNamespace):
         return config_changed
 
     def update_from_dict(self, config_dictionary: dict):
+        """Apply changes to config and validate."""
         self.__dict__.update(config_dictionary)
         return not self.validate_configuration()
 

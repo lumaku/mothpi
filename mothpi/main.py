@@ -2,25 +2,25 @@
 # -*- coding:utf-8 -*-
 
 """
-Mothpi
+Mothpi - a tool for biodiversity monitoring of moths.
+Usually combined with a moth scanner, see:
+https://visammod.vision.in.tum.de/
 
-Usage:
-    - Run this file from bash
-
+--
 2021, Technische Universität München, Ludwig Kürzinger
 """
 
 import logging
 import argparse
-from mothpi.mp import MothPi
 import systemd.daemon
 import time
+from mothpi.mp import MothPi
 
 
 def get_parser():
     """Obtain an argument-parser for the script interface."""
     parser = argparse.ArgumentParser(
-        description="Mothpi main software",
+        description=__doc__,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
@@ -28,13 +28,19 @@ def get_parser():
         type=lambda x: x.upper(),
         default="INFO",
         choices=("CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG", "NOTSET"),
-        help="The verbose level of logging",
+        help="The verbosity level of logging",
     )
     parser.add_argument(
         "--app",
         dest="app",
-        action="store_true",
-        help="Start a web interface at port xxx (default: off).",
+        action=argparse.BooleanOptionalAction,
+        help="Also open a web interface",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=8000,
+        help="Change the port of the web app",
     )
     parser.set_defaults(app=True)
     return parser
@@ -54,10 +60,9 @@ def main():
 
     # if needed, start web interface
     if args.app:
-        port = 8000
+        port = args.port
         logging.info(f"Starting web app on port {port}.")
         from mothpi.app import create_app
-
         create_app().run(host="0.0.0.0", port=port)
 
     # Systemd service notification
