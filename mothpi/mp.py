@@ -4,19 +4,19 @@
 """
 Mothpi
 
-Put a Rapsberry Pi in the woods and take pictures of moths.
+Put a Raspberry Pi in the woods and take pictures of moths.
+
 
 2021, Technische Universität München, Ludwig Kürzinger
-
 """
 
 
-import time
 import datetime
 import queue
 import logging
-import systemd.daemon
+import time
 from pathlib import Path
+from typing import Union
 
 # Mothpi imports
 import gphoto2 as gp
@@ -24,7 +24,8 @@ from camera import MothCamera
 from relais import Relais
 from display import Epaper, paint_status_page, paint_simple_text_output
 from config import MothConf
-from utils import Periodic, get_parser, reboot, is_disk_full
+from utils import Periodic, reboot, is_disk_full, is_sunshine
+from utils import Weather
 
 
 class MothPi:
@@ -35,7 +36,11 @@ class MothPi:
     services = {}
     started_on = datetime.datetime.now()
 
-    def __init__(self, configuration: MothConf):
+    def __init__(self, configuration: Union[MothConf, str]):
+
+        if type(configuration) == str:
+            configuration = MothConf(config_file=configuration)
+
         self.config = configuration
         self.services["periodic_pictures"] = Periodic(
             interval=self.config.capture_interval,
@@ -47,11 +52,6 @@ class MothPi:
             function=self.poll_status,
             autostart=False,
         )
-        self.services["periodic_reconnect"] = Periodic(
-            interval=self.config.cam_reconnect_interval,
-            function=self.poll_status,
-            autostart=False,
-        )
         self.status_dict = {
             "camera": self.camera.is_available,
             "display": Epaper.is_available,
@@ -60,19 +60,33 @@ class MothPi:
             "footer1": "1:CamReconn",
             "footer2": "3: Reboot",
         }
-        for item in self.config.relais_conf:
-            if self.config.relais_conf[item]:
-                Relais.set_on(item)
-            else:
-                Relais.set_off(item)
-        # initialize buttons
+        # initialize GPIOs
+        self.set_relais()
         Epaper.set_button_handler(1, self.camera.reconnect)
         Epaper.set_button_handler(3, reboot)
+        # Utilities
+        self.weather = Weather
+        self.weather.update_weather(lat=self.config.lat, lon = self.config.lon)
         # execute the services once to make sure they work:
         self.refresh_camera()
         self.poll_status()
         self.take_pictures()
         self.poll_status()
+
+    def set_relais(self, state="on"):
+        power_save_mode = self.power_save_mode
+        if state == "on" and not power_save_mode:
+            for item in self.config.relais_conf:
+                if self.config.relais_conf[item]:
+                    Relais.set_on(item)
+                else:
+                    Relais.set_off(item)
+        elif state == "on" and power_save_mode:
+            Relais.reset()
+        elif state == "off":
+            Relais.reset()
+        else:
+            logging.error(f"No valid relais state: {state}")
 
     def serve(self):
         for service in self.services.values():
@@ -81,29 +95,53 @@ class MothPi:
     def stop_service(self):
         for service in self.services.values():
             service.stop()
-        # disables all relais:
-        for i in [1,2,3]:
-            Relais.set_off(i)
+        self.set_relais("off")
+        time.sleep(1)
 
     def poll_status(self):
         self.status_dict["camera"] = self.camera.is_available
         self.status_dict["display"] = Epaper.is_available
-        self.status_dict["num_pics"] = self.config.num_stored_pictures
+        self.status_dict["num_pics"] = self.config.get_num_stored_pictures()
         self.status_dict["poll_time"] = datetime.datetime.now()
         status_image = paint_status_page(self.status_dict)
-        cc_to =  Path(self.config.pictures_save_folder) / ("epaper_display.png")
+        cc_to =  self.config.get_status_img_path()
         Epaper.display(status_image, cc_to=str(cc_to))
+        # If the device configured for reset
+        if self.ready_for_restart:
+            self.stop_service()
+            reboot()
 
     def take_pictures(self):
+        # switch off lamp if needed
+        if self.config.capture_deactivate_lamp:
+            self.set_relais("off")
+        # capture
         picture_path = self.camera.capture()
-        if picture_path and not is_disk_full(self.config.pictures_save_folder):
+        if picture_path and self.valid_capture_conditions:
             timestr = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
             self.status_dict["last_picture"] = timestr
             target = Path(self.config.pictures_save_folder) / (timestr + ".jpg")
             self.camera.save(picture_path, target)
+        # turn lamp back on if needed
+        if self.config.capture_deactivate_lamp:
+            self.set_relais()
 
     def refresh_camera(self):
         self.camera.reconnect()
+
+    @property
+    def power_save_mode(self):
+        if self.config.power_save_daylight and is_sunshine(lat=self.config.lat, lon = self.config.lon):
+            return True
+        if self.config.power_save_weather and Weather.safe_for_moths_weather():
+            return True
+        return False
+
+    @property
+    def valid_capture_conditions(self):
+        if is_disk_full(self.config.pictures_save_folder):
+            return False
+        return not self.power_save_mode
 
     @property
     def ready_for_restart(self):
@@ -115,42 +153,3 @@ class MothPi:
                 return True
         return False
 
-
-def main():
-    # Initialize
-    parser = get_parser()
-    args = parser.parse_args()
-    logger = logging.getLogger()
-    logger.setLevel(args.log_level)
-    formatter = logging.Formatter("(%(module)s:%(lineno)d) %(levelname)s: %(message)s")
-    logger.handlers[0].setFormatter(formatter)
-
-    # Set up Mothpi
-    config = MothConf(config_file=args.config)
-    mothpi = MothPi(configuration=config)
-
-    # Systemd service notification
-    # https://github.com/torfsen/python-systemd-tutorial
-    systemd.daemon.notify("READY=1")
-    logging.info("Ready.")
-    logging.info(f"Configuration: {str(config)}")
-
-    config.daily_reboot = True
-    config.save_config()
-
-    try:
-        mothpi.serve()
-        while True:
-            time.sleep(1000)
-            if mothpi.ready_for_restart:
-                mothpi.stop_service()
-                reboot()
-    finally:
-        logging.info(" -- Shutting down")
-        # Stop all processes and wait until completion (with timeout)
-        mothpi.stop_service()
-        logging.info("The End!")
-
-
-if __name__ == "__main__":
-    main()

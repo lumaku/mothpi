@@ -1,0 +1,29 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "bootstrap/fixes.html" as fixes %}
+{% import "bootstrap/utils.html" as util %}
+
+{% block content %}
+{{util.flashed_messages(dismissible=True)}}
+<div class="container">
+  <h1>Mothpi</h1>
+
+  <h3>Last status picture:</h3>
+
+  <img src="{{ status_image }}" alt="Mothpi current status picture." style="border:5px double black;">
+  
+  <h3>Status:</h3>
+
+  
+</div>
+{% endblock %}
+
+{% block head %}
+{{super()}}
+{{fixes.ie8()}}
+{% endblock %}
+
+
+{% block navbar %}
+{{nav.mynavbar.render()}}
+{% endblock %}

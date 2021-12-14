@@ -46,9 +46,7 @@ class Relais:
     @staticmethod
     def cleanup():
         GPIO.cleanup()
-        relais_states[1] = False
-        relais_states[2] = False
-        relais_states[3] = False
+        Relais.reset()
 
     @staticmethod
     def set_on(channel):
@@ -67,3 +65,9 @@ class Relais:
             GPIO.output(relais_channels[channel], GPIO.HIGH)
         relais_states[channel] = False
         logging.info(f"Channel {channel} OFF!")
+
+    @staticmethod
+    def reset():
+        relais_states[1] = False
+        relais_states[2] = False
+        relais_states[3] = False

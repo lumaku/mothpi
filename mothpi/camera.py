@@ -12,6 +12,8 @@ import datetime
 # https://github.com/jim-easterbrook/python-gphoto2/tree/master/examples
 # for gphoto command line utility see
 # http://www.gphoto.org/doc/manual/ref-gphoto2-cli.html
+# The following functions were taken from the gphoto python project
+# https://github.com/jim-easterbrook/python-gphoto2
 
 
 class MothCamera:
@@ -85,10 +87,6 @@ class MothCamera:
         info = get_file_info(self.camera, filename)
         mtime = datetime.datetime.fromtimestamp(info.file.mtime).isoformat(" ")
         return mtime
-
-
-#### The following functions were taken from the gphoto python project
-# https://github.com/jim-easterbrook/python-gphoto2
 
 
 def list_files(camera, path="/"):

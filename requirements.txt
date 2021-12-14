@@ -1,2 +1,10 @@
 RPi.GPIO
 spidev
+suntime
+flask
+flask-appconfig
+flask-bootstrap
+flask-nav
+flask-debug
+flask-wtf
+netifaces
