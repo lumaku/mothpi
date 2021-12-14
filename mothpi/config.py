@@ -15,7 +15,6 @@ Usage:
 """
 
 import logging
-import sys
 from pathlib import Path
 from types import SimpleNamespace
 import json
@@ -39,6 +38,7 @@ class MothConf(SimpleNamespace):
     Also, variables are described by the same variable name
     with a preceding underscore (always type str).
     """
+
     # coordinates
     _lat = "Latitude coordinate"
     lat = 48.151
@@ -47,8 +47,10 @@ class MothConf(SimpleNamespace):
     # Take pictures in a certain interval (in seconds)
     _capture_interval = "Take pictures in a certain interval (in seconds)"
     capture_interval = 60 * 5
-    _polling_interval = "Obtain status information and " \
-                        "update epaper screen at a certain interval (s)"
+    _polling_interval = (
+        "Obtain status information and "
+        "update epaper screen at a certain interval (s)"
+    )
     polling_interval = 60 * 1
     _cam_reconnect_interval = "Interval time to reconnect to the camera (s)"
     cam_reconnect_interval = 60 * 60 * 5
@@ -67,8 +69,9 @@ class MothConf(SimpleNamespace):
     _use_weather_data = "Optional: use weather data to restrict storage use"
     use_weather_data = False
     # optional daily reboot at noon (only do this with correct time stamps)
-    _daily_reboot = "Daily reboot at noon " \
-                    "(only activate this with correct system time)"
+    _daily_reboot = (
+        "Daily reboot at noon " "(only activate this with correct system time)"
+    )
     daily_reboot = True
     # if needed, only capture at good weather conditions
     _power_save_weather = "Only capture at good weather conditions"
@@ -100,18 +103,23 @@ class MothConf(SimpleNamespace):
             try:
                 with open(config_file, "r") as f:
                     config = json.load(f)
-                self.__dict__.update(config)
+                self.update_from_dict(config)
             except:
                 logging.error("Error reading file, using default configuration.")
         self.config_file_name = str(config_file)
         Path(self.pictures_save_folder).mkdir(parents=True, exist_ok=True)
 
     def save_config(self):
+        logging.info(f"Saving the configuration in file {self.config_file_name}")
         with open(self.config_file_name, "w") as f:
             json.dump(self.__dict__, f)
 
     def get_dict(self):
-        return {x: getattr(self, x) for x in self.__dir__() if not (x.startswith('_') or type(x) not in [int, float, dict, str, bool])}
+        return {
+            x: getattr(self, x)
+            for x in self.__dir__()
+            if not (x.startswith("_") or type(x) not in [int, float, dict, str, bool])
+        }
 
     def get_descriptive_list(self):
         """Get a triple of key, value, description for configuration entries.
@@ -121,7 +129,7 @@ class MothConf(SimpleNamespace):
         descriptive_list = []
         for x in self.__dir__():
             description = "_" + x
-            is_not_special = not x.startswith('_')
+            is_not_special = not x.startswith("_")
             has_description = hasattr(self, description)
             is_correct_type = type(x) in [int, float, str, bool]
             if is_not_special and has_description and is_correct_type:
@@ -132,8 +140,43 @@ class MothConf(SimpleNamespace):
         return Path(self.pictures_save_folder) / self.status_image_filename
 
     def __str__(self):
-        config_dict = self.get_full_configuration()
+        config_dict = self.__dict__
         return str(config_dict)
 
     def get_num_stored_pictures(self):
-        return len(list(Path(self.pictures_save_folder).glob(f"*.{self.pictures_file_format}")))
+        return len(
+            list(Path(self.pictures_save_folder).glob(f"*.{self.pictures_file_format}"))
+        )
+
+    def validate_configuration(self):
+        """Ensure that parameters are in sane bounds."""
+        config_changed = False
+        if not -90.0 < self.lat < +90.0:
+            logging.warning(f"Parameter lat out of bounds {self.lat}")
+            self.lat = 48.151
+            config_changed = True
+        if not -180 < self.lon < +180.0:
+            logging.warning(f"Parameter lon out of bounds {self.lon}")
+            self.lon = 11.568
+            config_changed = True
+        if not 20 < self.capture_interval < 3700:
+            logging.warning(
+                f"Parameter capture_interval out of bounds {self.capture_interval}"
+            )
+            self.capture_interval = 60 * 5
+            config_changed = True
+        if not 3600 < self.cam_reconnect_interval < 1000000:
+            logging.warning(
+                f"Parameter cam_reconnect_interval out of bounds {self.cam_reconnect_interval}"
+            )
+            self.cam_reconnect_interval = 60 * 60 * 5
+            config_changed = True
+        return config_changed
+
+    def update_from_dict(self, config_dictionary: dict):
+        self.__dict__.update(config_dictionary)
+        return not self.validate_configuration()
+
+
+# This sets the global object for configuration
+config = MothConf()

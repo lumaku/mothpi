@@ -15,8 +15,6 @@ import argparse
 from mothpi.mp import MothPi
 import systemd.daemon
 import time
-from pathlib import Path
-from utils import reboot
 
 
 def get_parser():
@@ -33,12 +31,12 @@ def get_parser():
         help="The verbose level of logging",
     )
     parser.add_argument(
-        "--config",
-        type=Path,
-        required=False,
-        default=None,
-        help="Supplemental configuration file.",
+        "--app",
+        dest="app",
+        action="store_true",
+        help="Start a web interface at port xxx (default: off).",
     )
+    parser.set_defaults(app=True)
     return parser
 
 
@@ -52,7 +50,15 @@ def main():
     logger.handlers[0].setFormatter(formatter)
 
     # Set up Mothpi
-    mothpi = MothPi(configuration=args.config)
+    mothpi = MothPi()
+
+    # if needed, start web interface
+    if args.app:
+        port = 8000
+        logging.info(f"Starting web app on port {port}.")
+        from mothpi.app import create_app
+
+        create_app().run(host="0.0.0.0", port=port)
 
     # Systemd service notification
     # https://github.com/torfsen/python-systemd-tutorial

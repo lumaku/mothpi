@@ -12,7 +12,6 @@ from suntime import Sun
 from netifaces import interfaces, ifaddresses, AF_INET
 
 
-
 # mothpi-specific
 from display import Epaper, paint_simple_text_output
 
@@ -24,6 +23,7 @@ class Weather:
     x = WeatherStation()
     x.get_todays_weather_dict()
     """
+
     current_weather = {"wind_speed": 0.0, "temperature": 15.0}
     server_weather = {}
 
@@ -51,14 +51,20 @@ class Weather:
     def update_weather(self, lat=48.151, lon=11.568):
         weather_dict = self.get_weather_dict(lat, lon)
         hour = datetime.datetime.now().hour
-        if weather_dict.has_key("weather") and weather_dict["weather"].has_key(hour):
-            self.current_weather["wind_speed"]  = float(weather_dict["weather"][hour]["wind_speed"])
-            self.current_weather["temperature"] = float(weather_dict["weather"][hour]["temperature"])
+        if "weather" in weather_dict and hour in weather_dict["weather"]:
+            self.current_weather["wind_speed"] = float(
+                weather_dict["weather"][hour]["wind_speed"]
+            )
+            self.current_weather["temperature"] = float(
+                weather_dict["weather"][hour]["temperature"]
+            )
 
-    def safe_for_moths_weather(self, wind_speed_max=10, temperature_min=-5.0, temperature_max=50.0):
+    def safe_for_moths_weather(
+        self, wind_speed_max=10, temperature_min=-5.0, temperature_max=50.0
+    ):
         if self.current_weather["wind_speed"] > wind_speed_max:
             return False
-        if temperature_min  <=  self.current_weather["temperature"] <= temperature_max:
+        if temperature_min <= self.current_weather["temperature"] <= temperature_max:
             return False
         return True
 
@@ -114,7 +120,17 @@ def is_disk_full(path):
         return False
 
 
-def is_sunshine(lat=48.151, lon=11.568, at_time = None):
+def get_disk_free_capacity(path):
+    total, used, free = shutil.disk_usage(path)
+    mib = 1000 * 1000
+    free -= 50 * mib
+    if free <= 0:
+        free = 0
+    free /= 5 * mib  # how many 5MiB pics fit into the remaining space?
+    return int(free)
+
+
+def is_sunshine(lat=48.151, lon=11.568, at_time=None):
     if at_time is None:
         at_time = datetime.datetime.now(datetime.timezone.utc)
     # Please assert correct time zone information
@@ -128,16 +144,18 @@ def is_sunshine(lat=48.151, lon=11.568, at_time = None):
 
 
 def get_ip_addresses():
-    filter_addresses = ['127.0.0.1', 'No IP addr']
+    filter_addresses = ["127.0.0.1", "No IP addr"]
     local_interfaces = {}
     for interface_name in interfaces():
-        addresses = [i['addr'] for i in ifaddresses(interface_name).setdefault(AF_INET, [
-            {'addr': 'No IP addr'}])]
+        addresses = [
+            i["addr"]
+            for i in ifaddresses(interface_name).setdefault(
+                AF_INET, [{"addr": "No IP addr"}]
+            )
+        ]
         addresses = list(filter(lambda item: item not in filter_addresses, addresses))
         if interface_name not in ["lo"] and addresses:
             local_interfaces[interface_name] = addresses
     return local_interfaces
     # As string:
     # " ".join([f"{item}:{a[item][0]};" for item in a.keys()])
-
-

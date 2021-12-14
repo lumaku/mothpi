@@ -116,7 +116,7 @@ sync(){
 
 run(){
     # run mothpi
-    python3 ${BASEDIR}/mothpi/mothpi.py
+    python3 ${BASEDIR}/mothpi/main.py
 }
 
 
