@@ -1,7 +1,19 @@
 # MothPi
 
+*Mothpi* is a software for automated moth pictures used in biodiversity research.
+See https://visammod.vision.in.tum.de/ for build instructions of the device.
+
+Features:
+* Timer-based capture of moth pictures
+* Status updates to e-paper
+* Web app for status information and configuration
+* Standby during daytime based on calculated sunset and sunrise times
+* Standby during bad weather, automatic weather data retrieval
+
+
 ## Installation
 
+This software is programmed for use in a Rapsberry Pi with an e-paper shield and a relais shield.
 
 ### System packages
 
@@ -11,7 +23,7 @@ Required packages:
 sudo apt-get update
 sudo apt-get -y upgrade && sudo apt autoremove
 
-sudo apt install -y python3-setuptools python3-dev python3-pip libsystemd-dev python3-gphoto2 python3-gpiozero wiringpi python3-systemd gphoto2 python3-yaml
+sudo apt install -y python3-dev python3-pip libsystemd-dev wiringpi gphoto2
 sudo pip3 install -r requirements.txt
 ```
 
@@ -80,7 +92,7 @@ The core program that takes pictures is in `mothpi/mothpy.py`.
 ## Mothpi App
 
 The web app included in `mothpi/app.py` provides a web interface to check its status and change the configuration.
-It can be accessed on Port 8000.
+It can be accessed on Port 8000 by default.
 The IP address of the device is displayed on the e-Paper display, if available.
 
 Example configuration page:

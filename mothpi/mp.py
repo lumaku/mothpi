@@ -31,6 +31,17 @@ from mothpi.weather import Weather, is_sunshine
 
 
 class MothPi:
+    """Mothpi module.
+
+    This module contains the control logic for the moth scanner.
+     It starts several periodic timers that fulfill certain functions,
+    e.g., periodic status check-up, or image capture.
+    Furthermore, it contains several status functions that determine the
+    behaviour during daytime, or regular device restarts, ...
+
+    The timers are initialized with this module, and started with serve().
+    """
+
     state_queue = queue.Queue()
     pictures_queue = queue.Queue()
     camera = MothCamera()
@@ -39,6 +50,7 @@ class MothPi:
     started_on = datetime.datetime.now()
 
     def __init__(self):
+        """Initialize the module, set up periodic timers and reset the relays."""
         self.services["periodic_pictures"] = Periodic(
             interval=config.capture_interval,
             function=self.take_pictures,
@@ -74,6 +86,10 @@ class MothPi:
         self.poll_status()
 
     def set_relais(self, state="on"):
+        """Set the relays into a certain state.
+
+        Valid states: "on" or "off".
+        """
         power_save_mode = self.power_save_mode
         if state == "on" and not power_save_mode:
             for item in config.relais_conf:
@@ -89,16 +105,22 @@ class MothPi:
             logging.error(f"No valid relais state: {state}")
 
     def serve(self):
+        """Start all timers."""
         for service in self.services.values():
             service.start()
 
     def stop_service(self):
+        """Stop all timers."""
         for service in self.services.values():
             service.stop()
         self.set_relais("off")
         time.sleep(1)
 
     def poll_status(self):
+        """Self-check that prints a status message to the display,
+        and also stores the output image in a file that can be
+        uploaded to a server.
+        """
         self.status_dict["camera"] = self.camera.is_available
         self.status_dict["display"] = Epaper.is_available
         self.status_dict["num_pics"] = config.get_num_stored_pictures()
@@ -137,6 +159,11 @@ class MothPi:
             reboot()
 
     def take_pictures(self):
+        """Capture moth pictures with the camera.
+        Optionally, the lamp can be switched off during capture.
+        Pictures can be discarded during power save mode, during
+        daytime or during bad weather conditions.
+        """
         # switch off lamp if needed
         if not config.lamp_during_capture:
             self.set_relais("off")
@@ -152,10 +179,12 @@ class MothPi:
             self.set_relais("on")
 
     def refresh_camera(self):
+        """Re-connect to the camera, avoiding automatic standby."""
         self.camera.reconnect()
 
     @property
     def power_save_mode(self):
+        """Power save mode, depending on daylight and weather."""
         if config.power_save_daylight and is_sunshine(lat=config.lat, lon=config.lon):
             return True
         if config.power_save_weather and Weather.safe_for_moths_weather():
@@ -164,12 +193,14 @@ class MothPi:
 
     @property
     def valid_capture_conditions(self):
+        """Perform a check for disk space or power save mode."""
         if is_disk_full(config.pictures_save_folder):
             return False
         return not self.power_save_mode
 
     @property
     def ready_for_restart(self):
+        """Sometimes, the device needs a restart."""
         if config.daily_reboot:
             # reboot "tomorrow noon".
             tomorrow_noon = self.started_on.replace(hour=12, minute=0, second=0)

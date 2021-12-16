@@ -47,6 +47,14 @@ def get_parser():
 
 
 def main():
+    """Main function of mothpi.
+
+    This function starts the Mothpi program, and, if configured,
+    opens the web interface.
+
+    Also, if Mothpi is configured to run as a systemd service, it sends the
+    READY signal.
+    """
     # Initialize
     parser = get_parser()
     args = parser.parse_args()

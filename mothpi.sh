@@ -106,13 +106,9 @@ update(){
 
 
 sync(){
-    echo "sync pictures"
-    # get pictures directory
-
-    # rsync pictures to the server
-#    rsync mothpi@dl.visammod.vision.in.tum.de -p 58022
+    echo "To upload pictures, run:"
+    echo "systemctl --user start uploader.timer"
 }
-
 
 run(){
     # run mothpi
@@ -121,8 +117,7 @@ run(){
 
 
 serve(){
-    # run mothpi as service
-    echo "run: "
+    echo "To run mothpi as a service: "
     echo "systemctl --user start mothpi.service"
     echo "to stop: "
     echo "systemctl --user stop mothpi.service"
@@ -132,9 +127,8 @@ serve(){
 
 
 tunnel(){
-    echo "Creating a reverse ssh tunnel"
-    # create a reverse ssh tunnel
-    # ssh mothpi@dl.visammod.vision.in.tum.de -p 58022
+    echo "To create the reverse ssh tunnel, run:"
+    echo "systemctl --user start sshtunnel.service"
 }
 
 

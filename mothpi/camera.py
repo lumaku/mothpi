@@ -24,6 +24,8 @@ import datetime
 
 
 class MothCamera:
+    """Interface to the Sony alpha 6000."""
+
     camera = None
     camera_found = False
 
@@ -32,6 +34,7 @@ class MothCamera:
             self.reconnect()
 
     def reconnect(self):
+        """Connect or reconnect to the camera."""
         if self.camera:
             self.close()
         try:
@@ -45,9 +48,15 @@ class MothCamera:
 
     @property
     def is_available(self):
+        """Return the stored camer status.
+        Could be extended to make a self-check.
+        """
         return True if self.camera else False
 
     def summary(self):
+        """Get a camera summary.
+        For more information about that, see gphoto2 documentation.
+        """
         if self.is_available:
             text = self.camera.get_summary()
         else:
@@ -55,9 +64,14 @@ class MothCamera:
         return str(text)
 
     def get_camera_clock(self):
+        """It would be nice to have a function to determine the time from the camera.
+        The Sony alpha 6000 has an integrated clock with a limited battery.
+        Maybe see get_file_time() for an alternative.
+        """
         raise NotImplementedError
 
     def capture(self):
+        """Capture."""
         if self.camera_found:
             file_path = None
             try:
@@ -78,6 +92,7 @@ class MothCamera:
         return None
 
     def save(self, file_path, target=Path("/tmp") / "out.jpg"):
+        """Save the picture."""
         if self.is_available:
             logging.info(f"Copying image {file_path.name} to {target}")
             camera_file = self.camera.file_get(
@@ -86,17 +101,20 @@ class MothCamera:
             camera_file.save(str(target))
 
     def close(self):
+        """Close the connection to the camera."""
         if self.is_available:
             self.camera.exit()
             self.camera = None
 
     def get_file_time(self, filename):
+        """Get time information from the image file."""
         info = get_file_info(self.camera, filename)
         mtime = datetime.datetime.fromtimestamp(info.file.mtime).isoformat(" ")
         return mtime
 
 
 def list_files(camera, path="/"):
+    """List all files in a camera directory."""
     result = []
     # get files
     for name, value in camera.folder_list_files(path):
@@ -112,5 +130,9 @@ def list_files(camera, path="/"):
 
 
 def get_file_info(camera, path):
+    """Get image information.
+
+    See gphoto2 for more information about this function.
+    """
     folder, name = os.path.split(path)
     return camera.file_get_info(folder, name)

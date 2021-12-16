@@ -1,3 +1,8 @@
+setuptools
+gphoto2
+gpiozero
+systemd
+yaml
 RPi.GPIO
 spidev
 suntime
